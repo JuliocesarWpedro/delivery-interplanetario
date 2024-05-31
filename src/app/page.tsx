@@ -1,113 +1,113 @@
-import Image from "next/image";
+'use client';
+
+import React from 'react';
+import { CiSearch } from 'react-icons/ci';
+import { PiKeyReturnFill } from 'react-icons/pi';
+import { useRouter } from 'next/navigation';
+import AddressComponent from './components/address';
+import { useCart } from './context/CartContext';
+import { Address, AddressType } from './types/Address';
 
 export default function Home() {
+  const { replace } = useRouter();
+  const [searchAddress, setSearchAddress] = React.useState('');
+  const [activeAddress, setActiveAddress] =
+    React.useState<AddressType>('shipping');
+  const { cartItems } = useCart();
+  const [filteredAddresses, setFilteredAddresses] = React.useState<
+    Address[] | null
+  >(null);
+
+  const handleAddressClick = (addressType: AddressType) => {
+    setActiveAddress(addressType);
+  };
+
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchAddress(e.target.value);
+  };
+  React.useEffect(() => {
+    const filteredAddresses: Address[] = cartItems.filter((address) =>
+      address.fullName.toLowerCase().includes(searchAddress.toLowerCase()),
+    );
+    setFilteredAddresses(filteredAddresses);
+  }, [cartItems, searchAddress]);
+
   return (
-    <main className="flex min-h-screen flex-col items-center justify-between p-24">
-      <div className="z-10 w-full max-w-5xl items-center justify-between font-mono text-sm lg:flex">
-        <p className="fixed left-0 top-0 flex w-full justify-center border-b border-gray-300 bg-gradient-to-b from-zinc-200 pb-6 pt-8 backdrop-blur-2xl dark:border-neutral-800 dark:bg-zinc-800/30 dark:from-inherit lg:static lg:w-auto  lg:rounded-xl lg:border lg:bg-gray-200 lg:p-4 lg:dark:bg-zinc-800/30">
-          Get started by editing&nbsp;
-          <code className="font-mono font-bold">src/app/page.tsx</code>
-        </p>
-        <div className="fixed bottom-0 left-0 flex h-48 w-full items-end justify-center bg-gradient-to-t from-white via-white dark:from-black dark:via-black lg:static lg:size-auto lg:bg-none">
-          <a
-            className="pointer-events-none flex place-items-center gap-2 p-8 lg:pointer-events-auto lg:p-0"
-            href="https://vercel.com?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+    <div className="flex px-5 sm:px-8 md:px-15 lg:px-40 flex-col pt-20 bg-zinc-400 min-h-screen h-full pb-20 gap-5">
+      <div className="w-full bg-white text-black rounded-lg shadow-md p-6 h-full max-w-[1000px] items-center mx-auto">
+        <h1 className="text-2xl font-bold mb-4">Adress</h1>
+        <div className="w-full bg-slate-100 rounded-lg ">
+          <button
+            onClick={() => handleAddressClick('shipping')}
+            className={`${
+              activeAddress === 'shipping'
+                ? 'seja shadow-md bg-white text-xs sm:text-base text-black font-bold p-2 rounded-lg w-1/2'
+                : 'bg-slate-100 text-black text-xs sm:text-base p-2 rounded-lg w-1/2 h-full'
+            } `}
           >
-            By{" "}
-            <Image
-              src="/vercel.svg"
-              alt="Vercel Logo"
-              className="dark:invert"
-              width={100}
-              height={24}
-              priority
-            />
-          </a>
+            Shipping adress
+          </button>
+          <button
+            onClick={() => handleAddressClick('billing')}
+            className={`${
+              activeAddress === 'billing'
+                ? 'seja shadow-md bg-white text-xs sm:text-base text-black font-bold p-2 rounded-lg w-1/2'
+                : 'bg-slate-100 text-black text-xs sm:text-base p-2 rounded-lg w-1/2 h-full'
+            } `}
+          >
+            Billing adress
+          </button>
         </div>
+        <div className="flex flex-col sm:flex-row gap-2 lg:gap-5 pt-5 justify-center items-center">
+          <div className="w-full sm:w-3/5 relative flex items-center text-gray-400 focus-within:text-gray-600">
+            <CiSearch className="absolute ml-3 w-5 h-5 pointer-events-none" />
+            <input
+              type="text"
+              id="searchAddress"
+              placeholder="  Search the address here"
+              className="w-full block rounded-md ring-2 outline-none ring-gray-300 border-none placeholder-slate-300 p-8 pr-3 py-3 shadow-sm focus:ring-gray-500 focus:ring-2"
+              value={searchAddress}
+              onChange={handleSearchChange}
+            />
+          </div>
+          <button
+            onClick={() =>
+              replace(
+                activeAddress === 'shipping'
+                  ? '/addAddress?type=shipping'
+                  : '/addAddress?type=billing',
+              )
+            }
+            className="w-full mt-5 sm:mt-0 sm:w-2/5 py-3 border-2 rounded-lg border-indigo-600 bg-white font-bold text-indigo-600"
+          >
+            Add address
+          </button>
+        </div>
+        <h2 className="text-lg font-bold mb-2 mt-6">Address list</h2>
+        {filteredAddresses &&
+          filteredAddresses.map((address) => (
+            <div key={address.id} className="mb-4 bg-gray-100 p-4 rounded-lg">
+              <AddressComponent address={address} />
+            </div>
+          ))}
+        {filteredAddresses &&
+          filteredAddresses.length === 0 &&
+          !searchAddress && (
+            <div className="mb-4 bg-gray-100 p-4 rounded-lg">
+              {activeAddress === 'shipping'
+                ? cartItems
+                    .filter((item) => item.type === 'shipping')
+                    .map((address) => (
+                      <AddressComponent key={address.id} address={address} />
+                    ))
+                : cartItems
+                    .filter((item) => item.type === 'billing')
+                    .map((address) => (
+                      <AddressComponent key={address.id} address={address} />
+                    ))}
+            </div>
+          )}
       </div>
-
-      <div className="relative z-[-1] flex place-items-center before:absolute before:h-[300px] before:w-full before:-translate-x-1/2 before:rounded-full before:bg-gradient-radial before:from-white before:to-transparent before:blur-2xl before:content-[''] after:absolute after:-z-20 after:h-[180px] after:w-full after:translate-x-1/3 after:bg-gradient-conic after:from-sky-200 after:via-blue-200 after:blur-2xl after:content-[''] before:dark:bg-gradient-to-br before:dark:from-transparent before:dark:to-blue-700 before:dark:opacity-10 after:dark:from-sky-900 after:dark:via-[#0141ff] after:dark:opacity-40 sm:before:w-[480px] sm:after:w-[240px] before:lg:h-[360px]">
-        <Image
-          className="relative dark:drop-shadow-[0_0_0.3rem_#ffffff70] dark:invert"
-          src="/next.svg"
-          alt="Next.js Logo"
-          width={180}
-          height={37}
-          priority
-        />
-      </div>
-
-      <div className="mb-32 grid text-center lg:mb-0 lg:w-full lg:max-w-5xl lg:grid-cols-4 lg:text-left">
-        <a
-          href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className="mb-3 text-2xl font-semibold">
-            Docs{" "}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className="m-0 max-w-[30ch] text-sm opacity-50">
-            Find in-depth information about Next.js features and API.
-          </p>
-        </a>
-
-        <a
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className="mb-3 text-2xl font-semibold">
-            Learn{" "}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className="m-0 max-w-[30ch] text-sm opacity-50">
-            Learn about Next.js in an interactive course with&nbsp;quizzes!
-          </p>
-        </a>
-
-        <a
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className="mb-3 text-2xl font-semibold">
-            Templates{" "}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className="m-0 max-w-[30ch] text-sm opacity-50">
-            Explore starter templates for Next.js.
-          </p>
-        </a>
-
-        <a
-          href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className="mb-3 text-2xl font-semibold">
-            Deploy{" "}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className="m-0 max-w-[30ch] text-balance text-sm opacity-50">
-            Instantly deploy your Next.js site to a shareable URL with Vercel.
-          </p>
-        </a>
-      </div>
-    </main>
+    </div>
   );
 }
