@@ -3,9 +3,10 @@ Delivery Interplanetário
 Desenvolvedor: Julio Cesar Wanderosfky Pedro
 WhatsApp: (22) 98874-8242
 
-GitHub: JuliocesarWpedro
-Repositório do Projeto: Delivery Interplanetário
-Site do Projeto: Delivery Interplanetário Live
+GitHub: https://github.com/JuliocesarWpedro
+Repositório do Projeto: https://github.com/JuliocesarWpedro/delivery-interplanetario
+Site do Projeto: https://delivery-interplanetario-delta.vercel.app/
+
 Descrição
 
 O projeto Delivery Interplanetário é uma aplicação inovadora que permite aos usuários realizar entregas entre planetas. Utilizando tecnologias modernas de desenvolvimento web, este projeto demonstra a viabilidade de criar uma interface de usuário responsiva e intuitiva para um serviço de entrega em um contexto espacial.
