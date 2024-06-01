@@ -1,8 +1,6 @@
 'use client';
-
 import React from 'react';
 import { CiSearch } from 'react-icons/ci';
-import { PiKeyReturnFill } from 'react-icons/pi';
 import { useRouter } from 'next/navigation';
 import AddressComponent from './components/address';
 import { useCart } from './context/CartContext';
@@ -18,18 +16,19 @@ export default function Home() {
     Address[] | null
   >(null);
 
-  const handleAddressClick = (addressType: AddressType) => {
-    setActiveAddress(addressType);
-  };
-
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchAddress(e.target.value);
   };
+
+  React.useEffect(() => {});
+
   React.useEffect(() => {
     const filteredAddresses: Address[] = cartItems.filter((address) =>
       address.fullName.toLowerCase().includes(searchAddress.toLowerCase()),
     );
-    setFilteredAddresses(filteredAddresses);
+    if (searchAddress.length !== 0) {
+      setFilteredAddresses(filteredAddresses);
+    }
   }, [cartItems, searchAddress]);
 
   return (
@@ -38,7 +37,7 @@ export default function Home() {
         <h1 className="text-2xl font-bold mb-4">Adress</h1>
         <div className="w-full bg-slate-100 rounded-lg ">
           <button
-            onClick={() => handleAddressClick('shipping')}
+            onClick={() => setActiveAddress('shipping')}
             className={`${
               activeAddress === 'shipping'
                 ? 'seja shadow-md bg-white text-xs sm:text-base text-black font-bold p-2 rounded-lg w-1/2'
@@ -48,7 +47,7 @@ export default function Home() {
             Shipping adress
           </button>
           <button
-            onClick={() => handleAddressClick('billing')}
+            onClick={() => setActiveAddress('billing')}
             className={`${
               activeAddress === 'billing'
                 ? 'seja shadow-md bg-white text-xs sm:text-base text-black font-bold p-2 rounded-lg w-1/2'
@@ -64,7 +63,7 @@ export default function Home() {
             <input
               type="text"
               id="searchAddress"
-              placeholder="search for a created address (Enter the name)"
+              placeholder="Search for the name"
               className="w-full block rounded-md ring-2 outline-none ring-gray-300 border-none placeholder-slate-300 p-8 pr-3 py-3 shadow-sm focus:ring-gray-500 focus:ring-2"
               value={searchAddress}
               onChange={handleSearchChange}
@@ -85,28 +84,34 @@ export default function Home() {
         </div>
         <h2 className="text-lg font-bold mb-2 mt-6">Address list</h2>
         {filteredAddresses &&
-          filteredAddresses.map((address) => (
-            <div key={address.id} className="mb-4 bg-gray-100 p-4 rounded-lg">
-              <AddressComponent address={address} />
-            </div>
-          ))}
-        {filteredAddresses &&
-          filteredAddresses.length === 0 &&
-          !searchAddress && (
-            <div className="mb-4 bg-gray-100 p-4 rounded-lg">
-              {activeAddress === 'shipping'
-                ? cartItems
-                    .filter((item) => item.type === 'shipping')
-                    .map((address) => (
-                      <AddressComponent key={address.id} address={address} />
-                    ))
-                : cartItems
-                    .filter((item) => item.type === 'billing')
-                    .map((address) => (
-                      <AddressComponent key={address.id} address={address} />
-                    ))}
-            </div>
-          )}
+          (activeAddress === 'shipping'
+            ? filteredAddresses
+                .filter((item) => item.type === 'shipping')
+                .map((address) => (
+                  <AddressComponent key={address.id} address={address} />
+                ))
+            : filteredAddresses
+                .filter((item) => item.type === 'billing')
+                .map((address) => (
+                  <AddressComponent key={address.id} address={address} />
+                )))}
+
+        {!filteredAddresses && !searchAddress && (
+          <div className="mb-4 bg-gray-100 p-4 rounded-lg">
+            {activeAddress === 'shipping' &&
+              cartItems
+                .filter((item) => item.type === 'shipping')
+                .map((address) => (
+                  <AddressComponent key={address.id} address={address} />
+                ))}
+            {activeAddress === 'billing' &&
+              cartItems
+                .filter((item) => item.type === 'billing')
+                .map((address) => (
+                  <AddressComponent key={address.id} address={address} />
+                ))}
+          </div>
+        )}
       </div>
     </div>
   );
