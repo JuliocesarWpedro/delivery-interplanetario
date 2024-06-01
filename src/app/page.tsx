@@ -64,7 +64,7 @@ export default function Home() {
             <input
               type="text"
               id="searchAddress"
-              placeholder="  Search the address here"
+              placeholder="search for a created address (Enter the name)"
               className="w-full block rounded-md ring-2 outline-none ring-gray-300 border-none placeholder-slate-300 p-8 pr-3 py-3 shadow-sm focus:ring-gray-500 focus:ring-2"
               value={searchAddress}
               onChange={handleSearchChange}
